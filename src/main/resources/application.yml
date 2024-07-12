@@ -1,0 +1,12 @@
+server:
+  port: 9991
+
+commercetools:
+   commerce:
+     api:
+       host:  https://api.europe-west1.gcp.commercetools.com
+       auth_url: https://auth.europe-west1.gcp.commercetools.com
+       client_id: F0Wy07MV8_JqSw780DE5P_Wg
+       client_secret: KGGrhD3vqJhh_iN5pjL4rt0UiRDxEVx0
+       ctp_access_token: _8tHWaZGddF0I67mjKVUoCXMgsQbG5wi
+       project-key: credera-2test-b2b
