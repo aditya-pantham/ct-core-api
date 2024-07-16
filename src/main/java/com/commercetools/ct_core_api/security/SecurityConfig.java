@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -30,12 +31,10 @@ public class SecurityConfig {
 
     @Bean
     public UserDetailsService userDetailsService(PasswordEncoder encoder) {
-        log.info("Inside UserDetailsService");
         UserDetails user = User
                 .withUsername(clientId)
                 .password(encoder.encode(clientSecret))
                 .build();
-        log.info("User creds :" + user.getUsername());
         return new InMemoryUserDetailsManager(user);
     }
 
@@ -46,13 +45,14 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        return httpSecurity.csrf(csrfCustomizer -> csrfCustomizer.disable())
+        return httpSecurity.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.GET, "/ct/**").authenticated()
                         .requestMatchers(HttpMethod.POST, "/ct/**").authenticated()
                         .anyRequest().authenticated())
                 .httpBasic(httpBasic -> httpBasic.authenticationEntryPoint(
-                        (request, response, authException) -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized123")))
+                        (request, response, authException)
+                                -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized")))
                 .build();
     }
 }
