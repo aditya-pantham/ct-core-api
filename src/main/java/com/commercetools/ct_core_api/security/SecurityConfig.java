@@ -29,13 +29,23 @@ public class SecurityConfig {
     @Value("${commercetools.commerce.api.client_secret}")
     String clientSecret;
 
+    @Value("${sap.commerce.api.OAUTH_CLIENT_ID}")
+    String SapClientId;
+
+    @Value("${sap.commerce.api.OAUTH_CLIENT_SECRET}")
+    String SapClientSecret;
+
     @Bean
     public UserDetailsService userDetailsService(PasswordEncoder encoder) {
         UserDetails user = User
                 .withUsername(clientId)
                 .password(encoder.encode(clientSecret))
                 .build();
-        return new InMemoryUserDetailsManager(user);
+        UserDetails sapUser= User
+                .withUsername(SapClientId)
+                .password(encoder.encode(SapClientSecret))
+                .build();
+        return new InMemoryUserDetailsManager(user,sapUser);
     }
 
     @Bean
@@ -48,8 +58,8 @@ public class SecurityConfig {
         return httpSecurity.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.GET, "/ct/**").authenticated()
-                        .requestMatchers(HttpMethod.POST, "/ct/**").authenticated()
-                        .anyRequest().authenticated())
+//                        .requestMatchers(HttpMethod.POST, "/ct/**").authenticated()
+                        .anyRequest().permitAll())
                 .httpBasic(httpBasic -> httpBasic.authenticationEntryPoint(
                         (request, response, authException)
                                 -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized")))
